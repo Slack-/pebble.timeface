@@ -1,0 +1,35 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "Slack",
+    "longName": "Slack TimeFace",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/bluetooth.png",
+                "name": "IMAGE_BLUETOOTH",
+                "type": "png"
+            },
+            {
+                "file": "images/charging.png",
+                "name": "IMAGE_CHARGING",
+                "type": "png"
+            },
+            {
+                "file": "images/battery.png",
+                "name": "IMAGE_BATTERY",
+                "type": "png"
+            }
+        ]
+    },
+    "shortName": "Slack TimeFace",
+    "uuid": "14dceba1-d3f4-4c93-aa61-40d4bf83fd66",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
