@@ -6,6 +6,8 @@
 #include "Gui.h"
 
 #define DATE_BUFFER_LENGTH 12
+#define TIME_FONT FONT_KEY_ROBOTO_BOLD_SUBSET_49
+#define DATE_FONT FONT_KEY_GOTHIC_24
     
 /* Windows */
 static Window *wMainWindow;
@@ -171,10 +173,10 @@ static void MainWindowLoad(Window *wWindow)
     layer_add_child(window_get_root_layer(wWindow), bitmap_layer_get_layer(tBluetoothConnectedLayer));
     
     /* Create and add a time text layer */
-    tTimeLayer = text_layer_create(GRect(0, 52, 144, 50));
+    tTimeLayer = text_layer_create(GRect(0, 46, 144, 50));
     text_layer_set_background_color(tTimeLayer, GColorBlack);
     text_layer_set_text_color(tTimeLayer, GColorWhite);
-    text_layer_set_font(tTimeLayer, fonts_get_system_font(FONT_KEY_BITHAM_42_MEDIUM_NUMBERS));
+    text_layer_set_font(tTimeLayer, fonts_get_system_font(TIME_FONT));
     text_layer_set_text_alignment(tTimeLayer, GTextAlignmentCenter);
     layer_add_child(window_get_root_layer(wWindow), text_layer_get_layer(tTimeLayer));
     
@@ -182,7 +184,7 @@ static void MainWindowLoad(Window *wWindow)
     tDateLayer = text_layer_create(GRect(0, 96, 144, 30));
     text_layer_set_background_color(tDateLayer, GColorBlack);
     text_layer_set_text_color(tDateLayer, GColorWhite);
-    text_layer_set_font(tDateLayer, fonts_get_system_font(FONT_KEY_GOTHIC_24));
+    text_layer_set_font(tDateLayer, fonts_get_system_font(DATE_FONT));
     text_layer_set_text_alignment(tDateLayer, GTextAlignmentCenter);
     layer_add_child(window_get_root_layer(wWindow), text_layer_get_layer(tDateLayer));
 }
