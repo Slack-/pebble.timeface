@@ -36,10 +36,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeOutput>TimeFace.exe</NMakeOutput>
+    <NMakeOutput>TimeFace.pbw</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeForcedIncludes>D:\Projects\SDKs\PebbleSDK-2.8.1\Pebble\include;$(NMakeForcedIncludes)</NMakeForcedIncludes>
     <IncludePath>D:\Projects\SDKs\PebbleSDK-2.8.1\Pebble\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Projects\SDKs\PebbleSDK-2.8.1\Pebble\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>TimeFace.exe</NMakeOutput>
