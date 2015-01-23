@@ -17,7 +17,7 @@ void GuiInit(void);
 void GuiDeinit(void);
 
 /* 
-** Updates the battery level on the GUI.
+** Updates the battery level on the GUI. 
 ** u8BatteryLevelTenths - The number of tenths of the battery level left.
 ** bIsCharging - A value indicating whether the battery is charging.
 */
