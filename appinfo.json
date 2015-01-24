@@ -9,8 +9,8 @@
     "resources": {
         "media": [
             {
-                "file": "images/bluetooth.png",
-                "name": "IMAGE_BLUETOOTH",
+                "file": "images/battery.png",
+                "name": "IMAGE_BATTERY",
                 "type": "png"
             },
             {
@@ -19,8 +19,8 @@
                 "type": "png"
             },
             {
-                "file": "images/battery.png",
-                "name": "IMAGE_BATTERY",
+                "file": "images/bluetooth.png",
+                "name": "IMAGE_BLUETOOTH",
                 "type": "png"
             }
         ]

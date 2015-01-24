@@ -8,16 +8,23 @@
 #define DATE_BUFFER_LENGTH 12
 #define TIME_FONT FONT_KEY_ROBOTO_BOLD_SUBSET_49
 #define DATE_FONT FONT_KEY_GOTHIC_24
-    
-/* Windows */
-static Window *sw_main_window;
 
-/* Bitmaps */
+/* Graphics state management */
+static uint8_t su8_battery_level_width;
+    
+/* Private forward declarations */
+static void hide_gui(void);
+static void main_window_unload(Window *w_window);
+static void background_layer_update(Layer *t_layer, GContext *t_context);
+static void battery_level_layer_update(Layer *t_layer, GContext *t_context);
+
+// BEGIN AUTO-GENERATED UI CODE; DO NOT MODIFY
+static Window *s_window;
+
 static GBitmap *st_battery_shell_bitmap;
 static GBitmap *st_battery_charging_bitmap;
 static GBitmap *st_bluetooth_connected_bitmap;
 
-/* Graphics layers */
 static Layer *st_background_layer;
 static BitmapLayer *st_battery_shell_layer;
 static Layer *st_battery_level_layer;
@@ -26,14 +33,71 @@ static BitmapLayer *st_bluetooth_connected_layer;
 static TextLayer *st_time_layer;
 static TextLayer *st_date_layer;
 
-/* Graphics state management */
-static uint8_t su8_battery_level_width;
+static void initialise_ui(void) {
+    s_window = window_create();
+    window_set_fullscreen(s_window, true);
     
-/* Private forward declarations */
-static void main_window_load(Window *w_window);
-static void main_window_unload(Window *w_window);
-static void background_layer_update(Layer *t_layer, GContext *t_context);
-static void battery_level_layer_update(Layer *t_layer, GContext *t_context);
+    /* Create and add the background (drawing) layer */
+    st_background_layer = layer_create(GRect(0, 0, 144, 168));
+    layer_set_update_proc(st_background_layer, background_layer_update);
+    layer_add_child(window_get_root_layer(s_window), st_background_layer);
+    
+    /* Create and add a battery shell bitmap layer */
+    st_battery_shell_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY);
+    st_battery_shell_layer = bitmap_layer_create(GRect(126, 4, 15, 8));
+    bitmap_layer_set_bitmap(st_battery_shell_layer, st_battery_shell_bitmap);
+    layer_add_child(window_get_root_layer(s_window), bitmap_layer_get_layer(st_battery_shell_layer));
+    
+    /* Create and add the battery level layer */
+    st_battery_level_layer = layer_create(GRect(128, 6, 10, 4));
+    layer_set_update_proc(st_battery_level_layer, battery_level_layer_update);
+    layer_add_child(window_get_root_layer(s_window), st_battery_level_layer);
+    
+    /* Create the battery charging symbol */
+    st_battery_charging_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_CHARGING);
+    st_battery_charging_layer = bitmap_layer_create(GRect(117, 4, 7, 8));
+    bitmap_layer_set_bitmap(st_battery_charging_layer, st_battery_charging_bitmap);
+    layer_add_child(window_get_root_layer(s_window), bitmap_layer_get_layer(st_battery_charging_layer));
+    
+    /* Create the bluetooth connected symbol */
+    st_bluetooth_connected_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH);
+    st_bluetooth_connected_layer = bitmap_layer_create(GRect(3, 3, 7, 10));
+    bitmap_layer_set_bitmap(st_bluetooth_connected_layer, st_bluetooth_connected_bitmap);
+    layer_add_child(window_get_root_layer(s_window), bitmap_layer_get_layer(st_bluetooth_connected_layer));
+    
+    /* Create and add a time text layer */
+    st_time_layer = text_layer_create(GRect(0, 46, 144, 50));
+    text_layer_set_background_color(st_time_layer, GColorBlack);
+    text_layer_set_text_color(st_time_layer, GColorWhite);
+    text_layer_set_font(st_time_layer, fonts_get_system_font(TIME_FONT));
+    text_layer_set_text_alignment(st_time_layer, GTextAlignmentCenter);
+    layer_add_child(window_get_root_layer(s_window), text_layer_get_layer(st_time_layer));
+    
+    /* Create and add a date text layer */
+    st_date_layer = text_layer_create(GRect(0, 96, 144, 30));
+    text_layer_set_background_color(st_date_layer, GColorBlack);
+    text_layer_set_text_color(st_date_layer, GColorWhite);
+    text_layer_set_font(st_date_layer, fonts_get_system_font(DATE_FONT));
+    text_layer_set_text_alignment(st_date_layer, GTextAlignmentCenter);
+    layer_add_child(window_get_root_layer(s_window), text_layer_get_layer(st_date_layer));
+}
+
+static void destroy_ui(void) {
+    window_destroy(s_window);
+    
+    /* Destroy the text layers */
+    text_layer_destroy(st_time_layer);
+    
+    /* Destroy the status layers */
+    bitmap_layer_destroy(st_bluetooth_connected_layer);
+    bitmap_layer_destroy(st_battery_charging_layer);
+    layer_destroy(st_battery_level_layer);
+    bitmap_layer_destroy(st_battery_shell_layer);
+    
+    /* Destroy the background layer */
+    layer_destroy(st_background_layer);
+}
+// END AUTO-GENERATED UI CODE
 
 /* 
 ** Initialises the GUI. 
@@ -42,15 +106,14 @@ void gui_init(void)
 {
     /* Create main window element 
     and set handlers to manage the elements inside it */
-    sw_main_window = window_create();
-    window_set_window_handlers(sw_main_window, (WindowHandlers)
+    initialise_ui();
+    window_set_window_handlers(s_window, (WindowHandlers)
     {
-        .load = main_window_load,
         .unload = main_window_unload
     });
     
     /* Show the window on the watch as animated */
-    window_stack_push(sw_main_window, true);
+    window_stack_push(s_window, true);
     
     /* Show the current time and date */
     gui_update_time();
@@ -62,8 +125,8 @@ void gui_init(void)
 */
 void gui_deinit(void)
 {
-    /* Destroy the main window */
-    window_destroy(sw_main_window);
+    /* Remove and destroy the main window */
+    hide_gui();
 }
 
 /* 
@@ -140,71 +203,18 @@ void gui_update_date(void)
 /**************************** Private functions *****************************/
 
 /* 
-** Loads the main window.
-*/
-static void main_window_load(Window *w_window)
-{
-    /* Create and add the background (drawing) layer */
-    st_background_layer = layer_create(GRect(0, 0, 144, 168));
-    layer_set_update_proc(st_background_layer, background_layer_update);
-    layer_add_child(window_get_root_layer(w_window), st_background_layer);
-    
-    /* Create and add a battery shell bitmap layer */
-    st_battery_shell_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY);
-    st_battery_shell_layer = bitmap_layer_create(GRect(126, 4, 15, 8));
-    bitmap_layer_set_bitmap(st_battery_shell_layer, st_battery_shell_bitmap);
-    layer_add_child(window_get_root_layer(w_window), bitmap_layer_get_layer(st_battery_shell_layer));
-    
-    /* Create and add the battery level layer */
-    st_battery_level_layer = layer_create(GRect(128, 6, 10, 4));
-    layer_set_update_proc(st_battery_level_layer, battery_level_layer_update);
-    layer_add_child(window_get_root_layer(w_window), st_battery_level_layer);
-    
-    /* Create the battery charging symbol */
-    st_battery_charging_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_CHARGING);
-    st_battery_charging_layer = bitmap_layer_create(GRect(117, 4, 7, 8));
-    bitmap_layer_set_bitmap(st_battery_charging_layer, st_battery_charging_bitmap);
-    layer_add_child(window_get_root_layer(w_window), bitmap_layer_get_layer(st_battery_charging_layer));
-    
-    /* Create the bluetooth connected symbol */
-    st_bluetooth_connected_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH);
-    st_bluetooth_connected_layer = bitmap_layer_create(GRect(3, 3, 7, 10));
-    bitmap_layer_set_bitmap(st_bluetooth_connected_layer, st_bluetooth_connected_bitmap);
-    layer_add_child(window_get_root_layer(w_window), bitmap_layer_get_layer(st_bluetooth_connected_layer));
-    
-    /* Create and add a time text layer */
-    st_time_layer = text_layer_create(GRect(0, 46, 144, 50));
-    text_layer_set_background_color(st_time_layer, GColorBlack);
-    text_layer_set_text_color(st_time_layer, GColorWhite);
-    text_layer_set_font(st_time_layer, fonts_get_system_font(TIME_FONT));
-    text_layer_set_text_alignment(st_time_layer, GTextAlignmentCenter);
-    layer_add_child(window_get_root_layer(w_window), text_layer_get_layer(st_time_layer));
-    
-    /* Create and add a date text layer */
-    st_date_layer = text_layer_create(GRect(0, 96, 144, 30));
-    text_layer_set_background_color(st_date_layer, GColorBlack);
-    text_layer_set_text_color(st_date_layer, GColorWhite);
-    text_layer_set_font(st_date_layer, fonts_get_system_font(DATE_FONT));
-    text_layer_set_text_alignment(st_date_layer, GTextAlignmentCenter);
-    layer_add_child(window_get_root_layer(w_window), text_layer_get_layer(st_date_layer));
-}
-
-/* 
 ** Unloads the main window. 
 */
 static void main_window_unload(Window *w_window)
 {
-    /* Destroy the text layers */
-    text_layer_destroy(st_time_layer);
-    
-    /* Destroy the status layers */
-    bitmap_layer_destroy(st_bluetooth_connected_layer);
-    bitmap_layer_destroy(st_battery_charging_layer);
-    layer_destroy(st_battery_level_layer);
-    bitmap_layer_destroy(st_battery_shell_layer);
-    
-    /* Destroy the background layer */
-    layer_destroy(st_background_layer);
+    destroy_ui();
+}
+
+/* 
+** Hides the GUI.
+*/
+void hide_gui(void) {
+    window_stack_remove(s_window, true);
 }
 
 /* 
@@ -212,8 +222,8 @@ static void main_window_unload(Window *w_window)
 */
 static void background_layer_update(Layer *t_layer, GContext *t_context)
 {
-    graphics_context_set_fill_color(tContext, GColorBlack);
-    graphics_fill_rect(tContext, GRect(0, 0, 144, 168), 0, GCornerNone);
+    graphics_context_set_fill_color(t_context, GColorBlack);
+    graphics_fill_rect(t_context, GRect(0, 0, 144, 168), 0, GCornerNone);
 }
 
 /* 
@@ -223,7 +233,7 @@ static void battery_level_layer_update(Layer *t_layer, GContext *t_context)
 {
     if (su8_battery_level_width > 0)
     {
-        graphics_context_set_fill_color(tContext, GColorWhite);
-        graphics_fill_rect(tContext, GRect(0, 0, su8_battery_level_width, 4), 0, GCornerNone);
+        graphics_context_set_fill_color(t_context, GColorWhite);
+        graphics_fill_rect(t_context, GRect(0, 0, su8_battery_level_width, 4), 0, GCornerNone);
     }
 }

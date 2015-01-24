@@ -17,9 +17,9 @@ static void deinit(void);
 */
 int main(void)
 {
-    Init();
+    init();
     app_event_loop();
-    Deinit();
+    deinit();
 }
     
 /**************************** Private functions *****************************/
