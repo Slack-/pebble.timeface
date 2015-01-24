@@ -7,9 +7,9 @@
 /*
 ** Initialises the bluetooth manager.
 */
-void BluetoothInit(void);
+void bluetooth_init(void);
 
 /*
 ** Releases resources.
 */
-void BluetoothDeinit(void);
+void bluetooth_deinit(void);

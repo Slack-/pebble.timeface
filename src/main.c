@@ -3,14 +3,14 @@
 */
 
 #include <pebble.h>
-#include "Gui.h"
-#include "Battery.h"
-#include "Bluetooth.h"
-#include "Timer.h"
+#include "gui.h"
+#include "battery.h"
+#include "bluetooth.h"
+#include "timer.h"
 
 /* Private forward declarations */
-static void Init(void);
-static void Deinit(void);
+static void init(void);
+static void deinit(void);
 
 /* 
 ** Entry point for the application. 
@@ -27,23 +27,23 @@ int main(void)
 /* 
 ** Application intialisation. 
 */
-static void Init(void)
+static void init(void)
 {
     /* Initialize the comms and GUI */
-    GuiInit();
-    BatteryInit();
-    BluetoothInit();
-    TimerInit();
+    gui_init();
+    battery_init();
+    bluetooth_init();
+    timer_init();
 }
 
 /* 
 ** Releases application resources. 
 */
-static void Deinit(void)
+static void deinit(void)
 {
     /* Destroy the comms and GUI */
-    TimerDeinit();
-    BluetoothDeinit();
-    BatteryDeinit();
-    GuiDeinit();
+    timer_deinit();
+    bluetooth_deinit();
+    battery_deinit();
+    gui_deinit();
 }

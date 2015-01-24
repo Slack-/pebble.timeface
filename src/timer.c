@@ -3,25 +3,25 @@
 */
 
 #include <pebble.h>
-#include "Timer.h"
-#include "Gui.h"
+#include "timer.h"
+#include "gui.h"
 
 /* Private forward declarations */
-static void TickTimerHandler(struct tm *tTickTime, TimeUnits tUnitsChanged);
+static void tick_timer_handler(struct tm *t_tick_time, TimeUnits t_units_changed);
 
 /*
 ** Initialises the tick timer.
 */
-void TimerInit(void)
+void timer_init(void)
 {
     /* Register with the tick timer service for updates */
-    tick_timer_service_subscribe(MINUTE_UNIT, TickTimerHandler);
+    tick_timer_service_subscribe(MINUTE_UNIT, tick_timer_handler);
 }
 
 /*
 ** Releases resources.
 */
-void TimerDeinit(void)
+void timer_deinit(void)
 {
     tick_timer_service_unsubscribe();
 }
@@ -31,14 +31,14 @@ void TimerDeinit(void)
 /*
 ** Handles the timer tick event.
 */
-static void TickTimerHandler(struct tm *tTickTime, TimeUnits tUnitsChanged)
+static void tick_timer_handler(struct tm *t_tick_time, TimeUnits t_units_changed)
 {
     /* Refresh the time on the GUI */
-    GuiUpdateTime();
+    gui_update_time();
     
     /* Refresh the date on the GUI every day */
-    if (tUnitsChanged & DAY_UNIT)
+    if (t_units_changed & DAY_UNIT)
     {
-        GuiUpdateDate();
+        gui_update_date();
     }
 }

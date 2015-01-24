@@ -7,9 +7,9 @@
 /* 
 ** Initialises the tick timer. 
 */
-void TimerInit(void);
+void timer_init(void);
 
 /* 
 ** Releases resources. 
 */
-void TimerDeinit(void);
+void timer_deinit(void);

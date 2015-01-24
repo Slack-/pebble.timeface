@@ -7,9 +7,9 @@
 /*
 ** Initialises the battery manager.
 */
-void BatteryInit(void);
+void battery_init(void);
 
 /*
 ** Releases resources.
 */
-void BatteryDeinit(void);
+void battery_deinit(void);

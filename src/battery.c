@@ -3,28 +3,28 @@
 */
 
 #include <pebble.h>
-#include "Battery.h"
-#include "Gui.h"
+#include "battery.h"
+#include "gui.h"
 
 /* Private forward declarations */
-static void BatteryStateUpdateHandler(BatteryChargeState tsChargeState);
+static void battery_state_update_handler(BatteryChargeState ts_charge_state);
 
 /*
 ** Initialises the battery manager.
 */
-void BatteryInit(void)
+void battery_init(void)
 {
     /* Update with the current battery level */
-    BatteryStateUpdateHandler(battery_state_service_peek());
+    battery_state_update_handler(battery_state_service_peek());
         
     /* Register with the battery state service for further updates */
-    battery_state_service_subscribe(BatteryStateUpdateHandler);
+    battery_state_service_subscribe(battery_state_update_handler);
 }
 
 /*
 ** Releases resources.
 */
-void BatteryDeinit(void)
+void battery_deinit(void)
 {
     battery_state_service_unsubscribe();
 }
@@ -34,7 +34,7 @@ void BatteryDeinit(void)
 /* 
 ** Handles the battery state update event. 
 */
-static void BatteryStateUpdateHandler(BatteryChargeState tsChargeState)
+static void battery_state_update_handler(BatteryChargeState ts_charge_state)
 {
-    GuiUpdateBatteryLevel(tsChargeState.charge_percent / 10, tsChargeState.is_charging);
+    gui_update_battery_level(ts_charge_state.charge_percent / 10, ts_charge_state.is_charging);
 }
