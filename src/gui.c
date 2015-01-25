@@ -1,31 +1,23 @@
-/* 
-** Manages GUI set up and updating.
-*/
-
-#include <pebble.h>
 #include "gui.h"
+#include <pebble.h>
 
 #define DATE_BUFFER_LENGTH 12
-#define TIME_FONT FONT_KEY_ROBOTO_BOLD_SUBSET_49
-#define DATE_FONT FONT_KEY_GOTHIC_24
 
 /* Graphics state management */
 static uint8_t su8_battery_level_width;
     
 /* Private forward declarations */
-static void hide_gui(void);
 static void main_window_unload(Window *w_window);
-static void background_layer_update(Layer *t_layer, GContext *t_context);
+static void hide_gui(void);
 static void battery_level_layer_update(Layer *t_layer, GContext *t_context);
-
+    
 // BEGIN AUTO-GENERATED UI CODE; DO NOT MODIFY
 static Window *s_window;
-
-static GBitmap *st_battery_shell_bitmap;
-static GBitmap *st_battery_charging_bitmap;
-static GBitmap *st_bluetooth_connected_bitmap;
-
-static Layer *st_background_layer;
+static GFont s_res_roboto_bold_subset_49;
+static GFont s_res_gothic_24;
+static GBitmap *s_res_image_battery;
+static GBitmap *s_res_image_bluetooth;
+static GBitmap *s_res_image_charging;
 static BitmapLayer *st_battery_shell_layer;
 static Layer *st_battery_level_layer;
 static BitmapLayer *st_battery_charging_layer;
@@ -34,68 +26,64 @@ static TextLayer *st_time_layer;
 static TextLayer *st_date_layer;
 
 static void initialise_ui(void) {
-    s_window = window_create();
-    window_set_fullscreen(s_window, true);
-    
-    /* Create and add the background (drawing) layer */
-    st_background_layer = layer_create(GRect(0, 0, 144, 168));
-    layer_set_update_proc(st_background_layer, background_layer_update);
-    layer_add_child(window_get_root_layer(s_window), st_background_layer);
-    
-    /* Create and add a battery shell bitmap layer */
-    st_battery_shell_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY);
-    st_battery_shell_layer = bitmap_layer_create(GRect(126, 4, 15, 8));
-    bitmap_layer_set_bitmap(st_battery_shell_layer, st_battery_shell_bitmap);
-    layer_add_child(window_get_root_layer(s_window), bitmap_layer_get_layer(st_battery_shell_layer));
-    
-    /* Create and add the battery level layer */
-    st_battery_level_layer = layer_create(GRect(128, 6, 10, 4));
-    layer_set_update_proc(st_battery_level_layer, battery_level_layer_update);
-    layer_add_child(window_get_root_layer(s_window), st_battery_level_layer);
-    
-    /* Create the battery charging symbol */
-    st_battery_charging_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_CHARGING);
-    st_battery_charging_layer = bitmap_layer_create(GRect(117, 4, 7, 8));
-    bitmap_layer_set_bitmap(st_battery_charging_layer, st_battery_charging_bitmap);
-    layer_add_child(window_get_root_layer(s_window), bitmap_layer_get_layer(st_battery_charging_layer));
-    
-    /* Create the bluetooth connected symbol */
-    st_bluetooth_connected_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH);
-    st_bluetooth_connected_layer = bitmap_layer_create(GRect(3, 3, 7, 10));
-    bitmap_layer_set_bitmap(st_bluetooth_connected_layer, st_bluetooth_connected_bitmap);
-    layer_add_child(window_get_root_layer(s_window), bitmap_layer_get_layer(st_bluetooth_connected_layer));
-    
-    /* Create and add a time text layer */
-    st_time_layer = text_layer_create(GRect(0, 46, 144, 50));
-    text_layer_set_background_color(st_time_layer, GColorBlack);
-    text_layer_set_text_color(st_time_layer, GColorWhite);
-    text_layer_set_font(st_time_layer, fonts_get_system_font(TIME_FONT));
-    text_layer_set_text_alignment(st_time_layer, GTextAlignmentCenter);
-    layer_add_child(window_get_root_layer(s_window), text_layer_get_layer(st_time_layer));
-    
-    /* Create and add a date text layer */
-    st_date_layer = text_layer_create(GRect(0, 96, 144, 30));
-    text_layer_set_background_color(st_date_layer, GColorBlack);
-    text_layer_set_text_color(st_date_layer, GColorWhite);
-    text_layer_set_font(st_date_layer, fonts_get_system_font(DATE_FONT));
-    text_layer_set_text_alignment(st_date_layer, GTextAlignmentCenter);
-    layer_add_child(window_get_root_layer(s_window), text_layer_get_layer(st_date_layer));
+  s_window = window_create();
+  window_set_background_color(s_window, GColorBlack);
+  window_set_fullscreen(s_window, true);
+  
+  s_res_roboto_bold_subset_49 = fonts_get_system_font(FONT_KEY_ROBOTO_BOLD_SUBSET_49);
+  s_res_gothic_24 = fonts_get_system_font(FONT_KEY_GOTHIC_24);
+  s_res_image_battery = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY);
+  s_res_image_bluetooth = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH);
+  s_res_image_charging = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_CHARGING);
+  // st_battery_shell_layer
+  st_battery_shell_layer = bitmap_layer_create(GRect(126, 4, 15, 8));
+  bitmap_layer_set_bitmap(st_battery_shell_layer, s_res_image_battery);
+  layer_add_child(window_get_root_layer(s_window), (Layer *)st_battery_shell_layer);
+  
+  // st_battery_level_layer
+  st_battery_level_layer = layer_create(GRect(128, 6, 10, 4));
+  layer_add_child(window_get_root_layer(s_window), (Layer *)st_battery_level_layer);
+  
+  // st_battery_charging_layer
+  st_battery_charging_layer = bitmap_layer_create(GRect(117, 4, 7, 8));
+  bitmap_layer_set_bitmap(st_battery_charging_layer, s_res_image_charging);
+  layer_add_child(window_get_root_layer(s_window), (Layer *)st_battery_charging_layer);
+  
+  // st_bluetooth_connected_layer
+  st_bluetooth_connected_layer = bitmap_layer_create(GRect(3, 3, 7, 10));
+  bitmap_layer_set_bitmap(st_bluetooth_connected_layer, s_res_image_bluetooth);
+  layer_add_child(window_get_root_layer(s_window), (Layer *)st_bluetooth_connected_layer);
+  
+  // st_time_layer
+  st_time_layer = text_layer_create(GRect(0, 46, 144, 50));
+  text_layer_set_background_color(st_time_layer, GColorBlack);
+  text_layer_set_text_color(st_time_layer, GColorWhite);
+  text_layer_set_text(st_time_layer, "00:00");
+  text_layer_set_text_alignment(st_time_layer, GTextAlignmentCenter);
+  text_layer_set_font(st_time_layer, s_res_roboto_bold_subset_49);
+  layer_add_child(window_get_root_layer(s_window), (Layer *)st_time_layer);
+  
+  // st_date_layer
+  st_date_layer = text_layer_create(GRect(0, 96, 144, 30));
+  text_layer_set_background_color(st_date_layer, GColorBlack);
+  text_layer_set_text_color(st_date_layer, GColorWhite);
+  text_layer_set_text(st_date_layer, "January 1");
+  text_layer_set_text_alignment(st_date_layer, GTextAlignmentCenter);
+  text_layer_set_font(st_date_layer, s_res_gothic_24);
+  layer_add_child(window_get_root_layer(s_window), (Layer *)st_date_layer);
 }
 
 static void destroy_ui(void) {
-    window_destroy(s_window);
-    
-    /* Destroy the text layers */
-    text_layer_destroy(st_time_layer);
-    
-    /* Destroy the status layers */
-    bitmap_layer_destroy(st_bluetooth_connected_layer);
-    bitmap_layer_destroy(st_battery_charging_layer);
-    layer_destroy(st_battery_level_layer);
-    bitmap_layer_destroy(st_battery_shell_layer);
-    
-    /* Destroy the background layer */
-    layer_destroy(st_background_layer);
+  window_destroy(s_window);
+  bitmap_layer_destroy(st_battery_shell_layer);
+  layer_destroy(st_battery_level_layer);
+  bitmap_layer_destroy(st_battery_charging_layer);
+  bitmap_layer_destroy(st_bluetooth_connected_layer);
+  text_layer_destroy(st_time_layer);
+  text_layer_destroy(st_date_layer);
+  gbitmap_destroy(s_res_image_battery);
+  gbitmap_destroy(s_res_image_bluetooth);
+  gbitmap_destroy(s_res_image_charging);
 }
 // END AUTO-GENERATED UI CODE
 
@@ -111,6 +99,9 @@ void gui_init(void)
     {
         .unload = main_window_unload
     });
+    
+    /* Set custom layer drawing produres */
+    layer_set_update_proc(st_battery_level_layer, battery_level_layer_update);
     
     /* Show the window on the watch as animated */
     window_stack_push(s_window, true);
@@ -141,7 +132,7 @@ void gui_update_battery_level(uint8_t u8_battery_level_tenths, bool b_is_chargin
     
     /* Refresh the battery level and hide the charging image if required */
     layer_mark_dirty(st_battery_level_layer);
-    layer_set_hidden(bitmap_layer_get_layer(st_battery_charging_layer), !b_is_charging);
+    layer_set_hidden((Layer *)st_battery_charging_layer, !b_is_charging);
 }
 
 /* 
@@ -215,15 +206,6 @@ static void main_window_unload(Window *w_window)
 */
 void hide_gui(void) {
     window_stack_remove(s_window, true);
-}
-
-/* 
-** Draws the background layer. 
-*/
-static void background_layer_update(Layer *t_layer, GContext *t_context)
-{
-    graphics_context_set_fill_color(t_context, GColorBlack);
-    graphics_fill_rect(t_context, GRect(0, 0, 144, 168), 0, GCornerNone);
 }
 
 /* 
