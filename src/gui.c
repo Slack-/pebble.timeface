@@ -13,11 +13,11 @@ static void battery_level_layer_update(Layer *t_layer, GContext *t_context);
     
 // BEGIN AUTO-GENERATED UI CODE; DO NOT MODIFY
 static Window *s_window;
+static GBitmap *s_res_image_battery;
+static GBitmap *s_res_image_charging;
+static GBitmap *s_res_image_bluetooth;
 static GFont s_res_roboto_bold_subset_49;
 static GFont s_res_gothic_24;
-static GBitmap *s_res_image_battery;
-static GBitmap *s_res_image_bluetooth;
-static GBitmap *s_res_image_charging;
 static BitmapLayer *st_battery_shell_layer;
 static Layer *st_battery_level_layer;
 static BitmapLayer *st_battery_charging_layer;
@@ -30,11 +30,11 @@ static void initialise_ui(void) {
   window_set_background_color(s_window, GColorBlack);
   window_set_fullscreen(s_window, true);
   
+  s_res_image_battery = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY);
+  s_res_image_charging = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_CHARGING);
+  s_res_image_bluetooth = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH);
   s_res_roboto_bold_subset_49 = fonts_get_system_font(FONT_KEY_ROBOTO_BOLD_SUBSET_49);
   s_res_gothic_24 = fonts_get_system_font(FONT_KEY_GOTHIC_24);
-  s_res_image_battery = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BATTERY);
-  s_res_image_bluetooth = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BLUETOOTH);
-  s_res_image_charging = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_CHARGING);
   // st_battery_shell_layer
   st_battery_shell_layer = bitmap_layer_create(GRect(126, 4, 15, 8));
   bitmap_layer_set_bitmap(st_battery_shell_layer, s_res_image_battery);
@@ -82,8 +82,8 @@ static void destroy_ui(void) {
   text_layer_destroy(st_time_layer);
   text_layer_destroy(st_date_layer);
   gbitmap_destroy(s_res_image_battery);
-  gbitmap_destroy(s_res_image_bluetooth);
   gbitmap_destroy(s_res_image_charging);
+  gbitmap_destroy(s_res_image_bluetooth);
 }
 // END AUTO-GENERATED UI CODE
 
@@ -141,7 +141,7 @@ void gui_update_battery_level(uint8_t u8_battery_level_tenths, bool b_is_chargin
 */
 void gui_update_connection_status(bool b_is_connected)
 {
-	layer_set_hidden(bitmap_layer_get_layer(st_bluetooth_connected_layer), !b_is_connected);
+	layer_set_hidden((Layer *)st_bluetooth_connected_layer, !b_is_connected);
 }
 
 /* 
